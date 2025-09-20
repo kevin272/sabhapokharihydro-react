@@ -1,0 +1,23 @@
+{
+  "name": "sabhapokharihydro-react",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kevin272/sabhapokharihydro-react.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kevin272/sabhapokharihydro-react/issues"
+  },
+  "homepage": "https://github.com/kevin272/sabhapokharihydro-react#readme",
+  "dependencies": {
+    "vite": "^7.1.6"
+  }
+}
