@@ -1,0 +1,58 @@
+@import "tailwindcss";
+
+/* src/components/AdminFooter.css */
+:root {
+  --footer-bg: var(--color-gray-800);
+  --footer-border: #e5e7eb;       /* slate-200 */
+  --footer-text: #ffffff;         /* slate-600 */
+  --footer-link: #2563eb;         /* blue-600 */
+  --footer-link-hover: #1d4ed8;   /* blue-700 */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --footer-bg: rgba(15, 23, 42, 0.9);  /* slate-900-ish */
+    --footer-border: #0f172a;            /* slate-900 */
+    --footer-text: #cbd5e1;              /* slate-300 */
+    --footer-link: #38bdf8;              /* sky-400 */
+    --footer-link-hover: #0ea5e9;        /* sky-500 */
+  }
+}
+
+.copyright-wrap {
+  width: 100%;
+  background: var(--footer-bg);
+  backdrop-filter: saturate(160%) blur(8px);
+  -webkit-backdrop-filter: saturate(160%) blur(8px);
+  border-top: 1px solid var(--footer-border);
+}
+
+.copyright-text {
+  margin: 0;
+  padding: 12px 16px;
+  text-align: center;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--footer-text);
+  letter-spacing: 0.2px;
+}
+
+.copyright-text a {
+  color: var(--footer-link);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.copyright-text a:hover {
+  color: var(--footer-link-hover);
+  text-decoration: underline;
+}
+
+/* Optional: make footer stick to bottom when content is short.
+   Wrap your page in a flex column container and let footer push down.
+   Example:
+   #root, body, html { height: 100%; }
+   .admin-app { min-height: 100%; display: flex; flex-direction: column; }
+   .admin-main { flex: 1; }
+   Place <AdminFooter/> after .admin-main.
+*/
