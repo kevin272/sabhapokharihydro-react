@@ -24,12 +24,23 @@ import Blog from "./pages/Blog";
 import BlogDashboard from "./pages/Dashboardpages/BlogDashboard";
 import BlogForm from "./pages/Dashboardpages/BlogForm";
 import BlogEdit from "./pages/Dashboardpages/BlogEdit";
+import { Toaster } from "react-hot-toast";
+
 
 
 export default function App() {
   return (
     <BrowserRouter>
+
+<Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+        }}
+      />
+
       <Routes>
+        
         <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/aboutus" element={<About />} />

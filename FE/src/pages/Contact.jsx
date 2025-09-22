@@ -1,6 +1,9 @@
 import React from "react";
-import Breadcrumb from "../components/common/Breadcrumb";
+import { useState } from "react";
 
+import Breadcrumb from "../components/common/Breadcrumb";
+import axiosInstance from "../config/axios.config";
+import { toast } from "react-hot-toast";
 const ContactInfo = () => {
   return (
     <div className="rts-contact-info-area rts-section-gap">
@@ -85,7 +88,55 @@ const ContactInfo = () => {
   );
 };
 
-const ContactForm = () => {
+
+const SUBJECTS = [
+  "General Inquiry",
+  "Project Information",
+  "Investor / Shareholder",
+  "Partnership / MoU",
+  "Media & PR",
+  "Careers / Jobs",
+  "Technical Support",
+];
+const ContactForm =() => {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    number: "",
+    subject: "",
+    message: "",
+  });
+
+  const update = (e) => {
+    const { name, value } = e.target;
+    setForm((s) => ({ ...s, [name]: value }));
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+
+    // quick front-end validation for nicer toasts
+    if (!form.name.trim()) return toast.error("Please enter your name.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+      return toast.error("Please enter a valid email.");
+    if (!form.subject) return toast.error("Please select a subject.");
+    if (!form.message.trim()) return toast.error("Please write a message.");
+
+    await toast.promise(
+      axiosInstance.post("/contact", form),
+      {
+        loading: "Sending your message…",
+        success: "Thanks! Your message has been sent.",
+        error: (err) =>
+          err?.response?.data?.message ||
+          "Sorry, we couldn’t send your message. Please try again.",
+      }
+    );
+
+    // only clears if success (axios throws on non-2xx)
+    setForm({ name: "", email: "", number: "", subject: "", message: "" });
+  };
+
   return (
     <div className="rts-contact-wrapper-form-area rts-section-gapBottom">
       <div className="container">
@@ -96,14 +147,58 @@ const ContactForm = () => {
                 <p className="pre"><span>Feel Free</span> To Contact Us</p>
                 <h2 className="title">Let’s Get in Touch</h2>
               </div>
-              <div id="form-messages"></div>
-              <form id="contact-form" action="mailer.php" method="post" className="contact-page-form mt--30">
+
+              <form id="contact-form" className="contact-page-form mt--30" onSubmit={onSubmit} noValidate>
                 <div className="name-email-wraper">
-                  <input name="name" type="text" placeholder="Your Name" required />
-                  <input name="email" type="email" placeholder="Email Address" required />
+                  <input
+                    name="name"
+                    type="text"
+                    placeholder="Your Name"
+                    value={form.name}
+                    onChange={update}
+                    required
+                  />
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="Email Address"
+                    value={form.email}
+                    onChange={update}
+                    required
+                  />
                 </div>
-                <input type="text" name="subject" placeholder="Select Subject" />
-                <textarea name="message" placeholder="Type Your Message" required></textarea>
+
+                <div className="name-email-wraper">
+  <input
+    type="tel"
+    name="number"
+    placeholder="Phone Number (optional)"
+    value={form.number}
+    onChange={update}
+  />
+
+  <select
+    name="subject"
+    aria-label="Select Subject"
+    value={form.subject}
+    onChange={update}
+    required
+  >
+    <option value="" disabled>Select Subject</option>
+    {SUBJECTS.map((s) => (
+      <option key={s} value={s}>{s}</option>
+    ))}
+  </select>
+</div>
+
+                <textarea
+                  name="message"
+                  placeholder="Type Your Message"
+                  value={form.message}
+                  onChange={update}
+                  required
+                />
+
                 <button className="rts-btn btn-primary">Send Message</button>
               </form>
             </div>
@@ -113,16 +208,23 @@ const ContactForm = () => {
             <div className="map-area-wrapper">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3531.8506236166004!2d85.29235829999999!3d27.721898!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb1893566e1b19%3A0xd2babe6b7135d434!2sBanasthali%2C%20Kathmandu%2044600!5e0!3m2!1sen!2snp!4v1757053672635!5m2!1sen!2snp"
-                width="100%" height="450" style={{ border: 0 }} allowFullScreen="" loading="lazy"
+                width="100%"
+                height="450"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
-              ></iframe>
+                title="Map"
+              />
             </div>
           </div>
         </div>
       </div>
     </div>
   );
-};
+}
+
+
 
 export default function Contact() {
     return (

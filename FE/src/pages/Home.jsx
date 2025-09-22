@@ -4,6 +4,9 @@ import Services from "../components/Services";
 import About from "../components/About";
 import WhyChooseUs from "../components/WhyChooseUs";
 import Footer from "../components/common/Footer";
+import LatestProject from "../components/LatestProject";
+import ProjectUpdates from "../components/ProjectUpdates";
+import LatestBlogSection from "../components/LatestBlog";
 
 export default function Home() {
   return (
@@ -12,6 +15,9 @@ export default function Home() {
       <Services />
       <About />
       <WhyChooseUs />
+      <LatestProject/>
+      <ProjectUpdates/>
+      <LatestBlogSection/>
     </>
   );
 }
