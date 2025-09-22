@@ -1,46 +1,41 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../config/axios.config";
 import DashboardLayout from "../../components/Dashboard/DashboardLayout";
 
 export default function ContactDashboard() {
   const [messages, setMessages] = useState([]);
   const [selectedMsg, setSelectedMsg] = useState(null);
-  const token = localStorage.getItem("token");
   const navigate = useNavigate();
-  const API_URL = import.meta.env.VITE_API_URL;
 
   const fetchMessages = async () => {
     try {
-      const res = await axios.get(`${API_URL}/contact/list`, {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      });
-      setMessages(res.data.data || []);
+      const body = await axiosInstance.get("/contact/list");
+      setMessages(body.data || []);
     } catch (err) {
       console.error("Error fetching messages:", err);
+      navigate("/login", { replace: true });
     }
   };
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
     if (!token) {
       navigate("/login");
       return;
     }
     fetchMessages();
-  }, [token, navigate]);
+  }, [navigate]);
 
   const handleDelete = async (id) => {
     if (!confirm("Are you sure you want to delete this message?")) return;
     try {
-      await axios.delete(`${API_URL}/contact/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axiosInstance.delete(`/contact/${id}`);
       setMessages((prev) => prev.filter((msg) => msg._id !== id));
       if (selectedMsg?._id === id) setSelectedMsg(null);
     } catch (err) {
       console.error("Error deleting message:", err);
-      alert(err.response?.data?.message || "Delete failed");
+      alert(err?.message || "Delete failed");
     }
   };
 
@@ -49,19 +44,9 @@ export default function ContactDashboard() {
 
     if (msg.status === "new") {
       try {
-        const res = await axios.put(
-          `${API_URL}/contact/${msg._id}/status`,
-          { status: "read" },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        // Update local state
-        setMessages((prev) =>
-          prev.map((m) =>
-            m._id === msg._id ? { ...m, status: res.data.data.status } : m
-          )
-        );
-        setSelectedMsg((prev) => ({ ...prev, status: res.data.data.status }));
+        const body = await axiosInstance.put(`/contact/${msg._id}/status`, { status: "read" });
+        setMessages((prev) => prev.map((m) => (m._id === msg._id ? { ...m, status: body.data.status } : m)));
+        setSelectedMsg((prev) => (prev ? { ...prev, status: body.data.status } : prev));
       } catch (err) {
         console.error("Error updating message status:", err);
       }
@@ -94,9 +79,7 @@ export default function ContactDashboard() {
               <div className="flex items-center justify-between mt-3">
                 <span
                   className={`inline-block px-3 py-1 text-xs font-medium rounded-full ${
-                    msg.status === "new"
-                      ? "bg-blue-100 text-blue-600"
-                      : "bg-green-100 text-green-600"
+                    msg.status === "new" ? "bg-blue-100 text-blue-600" : "bg-green-100 text-green-600"
                   }`}
                 >
                   {msg.status || "new"}
@@ -116,48 +99,31 @@ export default function ContactDashboard() {
         </div>
       )}
 
-      {/* Modal */}
       {selectedMsg && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 relative">
-            {/* Close button */}
-            <button
-              onClick={() => setSelectedMsg(null)}
-              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-            >
+            <button onClick={() => setSelectedMsg(null)} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
               ✖
             </button>
 
-            <h2 className="text-xl font-bold text-gray-800 mb-4 truncate">
-              {selectedMsg.subject}
-            </h2>
+            <h2 className="text-xl font-bold text-gray-800 mb-4 truncate">{selectedMsg.subject}</h2>
 
             <div className="space-y-2">
-              <p>
-                <strong>Name:</strong> {selectedMsg.name}
-              </p>
-              <p>
-                <strong>Email:</strong> {selectedMsg.email}
-              </p>
-              <p>
-                <strong>Phone:</strong> {selectedMsg.number || "N/A"}
-              </p>
+              <p><strong>Name:</strong> {selectedMsg.name}</p>
+              <p><strong>Email:</strong> {selectedMsg.email}</p>
+              <p><strong>Phone:</strong> {selectedMsg.number || "N/A"}</p>
               <p>
                 <strong>Status:</strong>{" "}
                 <span
                   className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${
-                    selectedMsg.status === "new"
-                      ? "bg-blue-100 text-blue-600"
-                      : "bg-green-100 text-green-600"
+                    selectedMsg.status === "new" ? "bg-blue-100 text-blue-600" : "bg-green-100 text-green-600"
                   }`}
                 >
                   {selectedMsg.status || "new"}
                 </span>
               </p>
               <div className="mt-4 p-3 bg-gray-50 rounded-lg border">
-                <p className="text-gray-700 whitespace-pre-line">
-                  {selectedMsg.message}
-                </p>
+                <p className="text-gray-700 whitespace-pre-line">{selectedMsg.message}</p>
               </div>
             </div>
           </div>

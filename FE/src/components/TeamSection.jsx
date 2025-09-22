@@ -1,18 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axiosInstance from "../config/axios.config"; // adjust path as needed
 
 const TeamSection = () => {
-  const teamMembers = [
-    {
-      name: "Dr. Laxmi Prasad Devkota",
-      role: "Chairman",
-      img: "https://sabhapokharihydro.com.np/assets/tenant/uploads/media-uploader/sabhapokharihydro/1ae37233-aaf6-4609-846b-32148136fa261745577541.jpg"
-    },
-    {
-      name: "Er. Shree Ram Devkota",
-      role: "Managing Director",
-      img: "https://sabhapokharihydro.com.np/assets/tenant/uploads/media-uploader/sabhapokharihydro/new-project-321745729471.png"
-    }
-  ];
+  const [teamMembers, setTeamMembers] = useState([]);
+  const baseURL = import.meta.env.VITE_API_URL.replace("/api", "");
+
+  useEffect(() => {
+    const fetchTeam = async () => {
+      try {
+        const body = await axiosInstance.get("/team"); // ✅ backend route
+        setTeamMembers(body.data); // assuming `sendResponse` wraps in { data: [...] }
+      } catch (err) {
+        console.error("Error fetching team:", err);
+      }
+    };
+    fetchTeam();
+  }, []);
+
 
   return (
     <div className="rts-team-area rts-section-gapBottom reveal align-items-center">
@@ -26,13 +30,13 @@ const TeamSection = () => {
           </div>
         </div>
         <div className="row mt--30 g-24">
-          {teamMembers.map((member, index) => (
+          {teamMembers?.map((member, index) => (
             <div className="col-lg-3" key={index}>
               <div className="solar-energy-team">
                 <div className="thumbnail">
                   <div style={{width: '100%', maxWidth: '600px', overflow: 'hidden', borderRadius: '20px', margin: '20px auto'}}>
                     <img
-                      src={member.img}
+                      src = {member.img ? `${baseURL}${member.img}` : 'https://via.placeholder.com/300x300?text=No+Image'}
                       alt="team"
                       style={{
                         width: '100%',
@@ -47,7 +51,7 @@ const TeamSection = () => {
                   </div>
                 </div>
                 <div className="inner-content">
-                  <a href="team-details.html"><h5 className="title">{member.name}</h5></a>
+                  <a href="/team-details"><h5 className="title">{member.name}</h5></a>
                   <span>{member.role}</span>
                 </div>
               </div>

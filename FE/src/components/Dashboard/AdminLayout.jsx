@@ -19,7 +19,8 @@ export default function AdminLayout() {
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
     { label: 'Services', href: '/services' },
-    { label: 'Contact', href: '/contact' }
+    { label: 'Contact', href: '/contact' },
+    { label: 'Blog', href: '/blogs' }
   ]}
   activeHref="/"
   className="custom-nav"

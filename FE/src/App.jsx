@@ -20,6 +20,11 @@ import ContactDashboard from "./pages/Dashboardpages/ContactDashboard";
 import ProjectEdit from "./pages/Dashboardpages/ProjectEdit";
 import TeamEdit from "./pages/Dashboardpages/TeamEdit";
 import Login from "./pages/Login";
+import Blog from "./pages/Blog";
+import BlogDashboard from "./pages/Dashboardpages/BlogDashboard";
+import BlogForm from "./pages/Dashboardpages/BlogForm";
+import BlogEdit from "./pages/Dashboardpages/BlogEdit";
+
 
 export default function App() {
   return (
@@ -32,9 +37,12 @@ export default function App() {
         <Route path="/team" element={<Team />} />
         <Route path="/team-details" element={<TeamDetails />} />
         <Route path ="/contact" element={<Contact/>} />
-        <Route path ="/project-details" element={<ProjectPage/>} />
         <Route path ="/blog-details" element={<BlogDetails/>} />
         <Route path="/login" element={<Login />} />
+        <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:id" element={<BlogDetails />} />
+        <Route path ="/project/:id" element={<ProjectPage/>} />
+
         </Route>
 
         <Route element = {<AdminLayout/>}>
@@ -48,6 +56,9 @@ export default function App() {
         <Route path="/admin/contact" element={<ContactDashboard/>} />
         <Route path="/admin/projects/add" element={<ProjectForm/>} />
         <Route path="/admin/projects/edit/:id" element={<ProjectEdit/>} />
+        <Route path="/admin/blogs" element={<BlogDashboard/>} />
+        <Route path="/admin/blogs/add" element={<BlogForm/>} />
+        <Route path="/admin/blogs/edit/:id" element={<BlogEdit/>} />
 
       </Route>
 

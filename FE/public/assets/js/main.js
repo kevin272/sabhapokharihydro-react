@@ -1084,6 +1084,8 @@
     }
 
   }
+  window.drJs = drJs;
+
   drJs.m();
   /* magnificPopup img view */
   $('.gallery-image').magnificPopup({
@@ -1104,6 +1106,13 @@ if (typeof ScrollSmoother !== "undefined") {
     });
   });
 }
+// Add this at the end of the IIFE, before it closes
+window.__SABHA_INIT_PAGE__ = function () {
+  if (window.jQuery) {
+    drJs.methods();   // re-run all your plugin initializers
+  }
+};
+
 
 
 

@@ -4,7 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "backend": "cd BE && npm run dev",
+    "frontend": "cd FE && npm run dev",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "cd FE && npm install --include=dev && npm run build && cd ../BE && npm install",
+    "start": "concurrently -n BE,FE -c blue,green \"npm:backend\" \"npm:frontend\""
   },
   "repository": {
     "type": "git",
@@ -18,6 +22,10 @@
   },
   "homepage": "https://github.com/kevin272/sabhapokharihydro-react#readme",
   "dependencies": {
-    "vite": "^7.1.6"
+    "cross-env": "^10.0.0",
+    "nodemon": "^3.1.10"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }

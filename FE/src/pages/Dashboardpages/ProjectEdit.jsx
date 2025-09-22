@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../config/axios.config";
 
 export default function ProjectEdit() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const API_URL = import.meta.env.VITE_API_URL;
+  const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/+$/, "");
 
   const [formData, setFormData] = useState({
     title: "",
@@ -31,10 +31,10 @@ export default function ProjectEdit() {
 
   // Fetch project by ID
   useEffect(() => {
-    const fetchProject = async () => {
+    (async () => {
       try {
-        const { data } = await axios.get(`${API_URL}/projects/${id}`);
-        const project = data.data; // ✅ backend wraps in data
+        const body = await axiosInstance.get(`/projects/${id}`);
+        const project = body.data;
 
         setFormData({
           title: project.title || "",
@@ -48,33 +48,22 @@ export default function ProjectEdit() {
           river: project.river || "",
           client: project.client || "",
           technologies: project.technologies?.join(", ") || "",
-          startDate: project.duration?.start
-            ? project.duration.start.split("T")[0]
-            : "",
-          endDate: project.duration?.end
-            ? project.duration.end.split("T")[0]
-            : "",
+          startDate: project.duration?.start ? project.duration.start.split("T")[0] : "",
+          endDate: project.duration?.end ? project.duration.end.split("T")[0] : "",
         });
 
-        setExistingImages(project.images || []); // ✅ objects {url, caption}
-      } catch (err) {
+        setExistingImages(project.images || []); // [{ url, caption }]
+      } catch {
         setError("Failed to load project data");
       }
-    };
+    })();
+  }, [id]);
 
-    fetchProject();
-  }, [API_URL, id]);
-
-  // Handle input change
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
   };
 
-  // Handle new image upload
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
     setNewImages((prev) => [...prev, ...files]);
@@ -82,18 +71,15 @@ export default function ProjectEdit() {
     setImagePreviews((prev) => [...prev, ...previews]);
   };
 
-  // Remove existing image
   const removeExistingImage = (idx) => {
     setExistingImages((prev) => prev.filter((_, i) => i !== idx));
   };
 
-  // Remove new image
   const removeNewImage = (idx) => {
     setNewImages((prev) => prev.filter((_, i) => i !== idx));
     setImagePreviews((prev) => prev.filter((_, i) => i !== idx));
   };
 
-  // Submit form
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -101,7 +87,6 @@ export default function ProjectEdit() {
 
     try {
       const payload = new FormData();
-
       const normalized = {
         ...formData,
         technologies: formData.technologies
@@ -115,27 +100,23 @@ export default function ProjectEdit() {
         payload.append(key, value);
       });
 
-      // Keep existing images
+      // Optional: keep existing images (server currently ignores this,
+      // but harmless if you add support later)
       existingImages.forEach((img) => {
         payload.append("existingImages", JSON.stringify(img));
       });
 
-      // Add new images
       newImages.forEach((file) => {
         payload.append("images", file);
       });
 
-      await axios.put(`${API_URL}/projects/${id}`, payload, {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "multipart/form-data",
-        },
+      await axiosInstance.put(`/projects/${id}`, payload, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       navigate("/admin/projects");
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to update project");
+      setError(err?.message || "Failed to update project");
     } finally {
       setLoading(false);
     }
@@ -149,119 +130,59 @@ export default function ProjectEdit() {
           {error && <div className="alert alert-danger">{error}</div>}
 
           <form onSubmit={handleSubmit}>
-            {/* Title */}
             <div className="mb-3">
               <label className="fw-semibold">Project Title</label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                className="form-control"
-                required
-              />
+              <input type="text" name="title" value={formData.title} onChange={handleChange} className="form-control" required />
             </div>
 
-            {/* Status */}
             <div className="mb-3">
               <label className="fw-semibold">Status</label>
-              <select
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                className="form-select"
-              >
+              <select name="status" value={formData.status} onChange={handleChange} className="form-select">
                 <option value="planning">Planning</option>
                 <option value="construction">Construction</option>
                 <option value="completed">Completed</option>
               </select>
             </div>
 
-            {/* Description */}
             <div className="mb-3">
               <label className="fw-semibold">Description</label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleChange}
-                className="form-control"
-                rows={4}
-                required
-              />
+              <textarea name="description" value={formData.description} onChange={handleChange} className="form-control" rows={4} required />
             </div>
 
-            {/* Short Description */}
             <div className="mb-3">
               <label className="fw-semibold">Short Description</label>
-              <input
-                type="text"
-                name="shortDescription"
-                value={formData.shortDescription}
-                onChange={handleChange}
-                className="form-control"
-                maxLength={200}
-              />
+              <input type="text" name="shortDescription" value={formData.shortDescription} onChange={handleChange} className="form-control" maxLength={200} />
             </div>
 
-            {/* Existing Images */}
             <div className="mb-3">
               <label className="fw-semibold">Project Images</label>
               <div className="d-flex flex-wrap gap-2 mt-2">
                 {existingImages.map((img, idx) => (
-                  <div
-                    key={idx}
-                    className="position-relative border rounded overflow-hidden"
-                    style={{ width: "100px", height: "100px" }}
-                  >
+                  <div key={idx} className="position-relative border rounded overflow-hidden" style={{ width: "100px", height: "100px" }}>
                     <img
                       src={`${API_URL.replace("/api", "")}${img.url}`}
                       alt={img.caption}
                       className="w-100 h-100 object-fit-cover"
                     />
-                    <button
-                      type="button"
-                      onClick={() => removeExistingImage(idx)}
-                      className="btn btn-sm btn-danger position-absolute top-0 end-0"
-                    >
+                    <button type="button" onClick={() => removeExistingImage(idx)} className="btn btn-sm btn-danger position-absolute top-0 end-0">
                       ×
                     </button>
                   </div>
                 ))}
 
                 {imagePreviews.map((src, idx) => (
-                  <div
-                    key={idx}
-                    className="position-relative border rounded overflow-hidden"
-                    style={{ width: "100px", height: "100px" }}
-                  >
-                    <img
-                      src={src}
-                      alt={`new-${idx}`}
-                      className="w-100 h-100 object-fit-cover"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeNewImage(idx)}
-                      className="btn btn-sm btn-danger position-absolute top-0 end-0"
-                    >
+                  <div key={idx} className="position-relative border rounded overflow-hidden" style={{ width: "100px", height: "100px" }}>
+                    <img src={src} alt={`new-${idx}`} className="w-100 h-100 object-fit-cover" />
+                    <button type="button" onClick={() => removeNewImage(idx)} className="btn btn-sm btn-danger position-absolute top-0 end-0">
                       ×
                     </button>
                   </div>
                 ))}
               </div>
-              <input
-                type="file"
-                multiple
-                className="form-control mt-2"
-                onChange={handleImageChange}
-              />
+              <input type="file" multiple className="form-control mt-2" onChange={handleImageChange} />
             </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn btn-primary w-100"
-            >
+            <button type="submit" disabled={loading} className="btn btn-primary w-100">
               {loading ? "Updating..." : "Update Project"}
             </button>
           </form>

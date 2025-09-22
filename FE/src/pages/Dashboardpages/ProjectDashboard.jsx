@@ -1,28 +1,20 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../config/axios.config";
 import DashboardLayout from "../../components/Dashboard/DashboardLayout";
 import DashboardTable from "../../components/Dashboard/DashboardTable";
 
 export default function ProjectDashboard() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const API_URL = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
 
-  // Fetch projects
   const fetchProjects = async () => {
     try {
-      const response = await axios.get(`${API_URL}/projects`, {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setProjects(response.data.data || []);
+      const body = await axiosInstance.get("/projects"); // BODY = { data: [...] }
+      setProjects(body.data || []);
     } catch (err) {
-      console.error("Error fetching projects:", err.response || err);
+      console.error("Error fetching projects:", err);
       setProjects([]);
     } finally {
       setLoading(false);
@@ -30,26 +22,19 @@ export default function ProjectDashboard() {
   };
 
   useEffect(() => {
-    if (!token) {
-      navigate("/login");
-      return;
-    }
+    const token = localStorage.getItem("token");
+    if (!token) return navigate("/login", { replace: true });
     fetchProjects();
-  }, [token, navigate]);
+  }, [navigate]);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this project?")) return;
     try {
-      await axios.delete(`${API_URL}/projects/${id}`, {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axiosInstance.delete(`/projects/${id}`);
       setProjects((prev) => prev.filter((p) => p._id !== id));
     } catch (err) {
-      console.error("Error deleting project:", err.response || err);
-      alert(err.response?.data?.message || "Delete failed");
+      console.error("Error deleting project:", err);
+      alert(err?.message || "Delete failed");
     }
   };
 
@@ -60,7 +45,6 @@ export default function ProjectDashboard() {
     { label: "Actions", style: { width: "200px" } },
   ];
 
-  // Map projects into <tr> elements
   const rows =
     projects.length > 0
       ? projects.map((p) => (
@@ -92,10 +76,7 @@ export default function ProjectDashboard() {
     <DashboardLayout
       title="Projects Dashboard"
       actions={
-        <Link
-          to="/admin/projects/add"
-          className="btn btn-success"
-        >
+        <Link to="/admin/projects/add" className="btn btn-success">
           ➕ Add Project
         </Link>
       }

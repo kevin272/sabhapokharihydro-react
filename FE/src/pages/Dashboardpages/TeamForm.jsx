@@ -19,8 +19,8 @@ export default function TeamForm() {
     if (id) {
       axiosInstance
         .get(`/team/${id}`, { headers: { Authorization: `Bearer ${token}` } })
-        .then((res) => {
-          const member = res.data.data;
+        .then((body) => {
+          const member = body.data;
           setName(member.name);
           setRole(member.role);
           if (member.img) setPreview(`${baseURL}${member.img}`);

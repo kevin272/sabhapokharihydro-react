@@ -12,10 +12,10 @@ export default function TeamDashboard() {
 
   const fetchTeam = async () => {
     try {
-      const res = await axiosInstance.get("/team", {
+      const body = await axiosInstance.get("/team", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setTeam(res.data.data || []);
+      setTeam(body.data || []);
     } catch (err) {
       setError(err.response?.data?.message || "Failed to load team");
     }

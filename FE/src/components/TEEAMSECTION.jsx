@@ -6,7 +6,7 @@ const teamData = [
     role: "Chairman",
     image:
       "https://sabhapokharihydro.com.np/assets/tenant/uploads/media-uploader/sabhapokharihydro/1ae37233-aaf6-4609-846b-32148136fa261745577541.jpg",
-    detailsUrl: "team-details.html",
+    detailsUrl: "/team-details",
     socials: {
       facebook: "https://facebook.com/",
       twitter: "https://twitter.com/",
@@ -19,7 +19,7 @@ const teamData = [
     role: "Managing Director",
     image:
       "https://sabhapokharihydro.com.np/assets/tenant/uploads/media-uploader/sabhapokharihydro/new-project-321745729471.png",
-    detailsUrl: "team-details.html",
+    detailsUrl: "/team-details",
     socials: {
       facebook: "#",
       twitter: "#",

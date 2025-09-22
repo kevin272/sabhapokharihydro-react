@@ -1,28 +1,49 @@
-import { Link } from "react-router-dom";
+import React from "react";
+import { Link } from "react-router-dom"; // use Link if you're using React Router
 
-const Breadcrumb = ({ title }) => (
-  <div
-        className="breadcumb-wrapper"
-        style={{
-    backgroundImage:
-      "url('https://www.sparkhydro.com/wp-content/uploads/2024/11/imager-3.png')",
-    backgroundSize: "cover",     // scale proportionally to cover the area
-    backgroundPosition: "center", // keep it centered
-    backgroundRepeat: "no-repeat",
-  }}
-      >
-        <div className="container">
-          <div className="breadcumb-content">
-            <h1 className="breadcumb-title">{title}</h1>
-            <ul className="breadcumb-menu">
-              <li>
-                <Link to="/admin">Home</Link>
-              </li>
-              <li>{title}</li>
-            </ul>
+const Breadcrumb = ({ title, links =[] }) => {
+  return (
+    <div className="rts-bread-crumb-area bg_image bg-breadcrumb">
+      <div className="container ptb--65">
+        <div className="row">
+          <div className="col-lg-12">
+            <div className="con-tent-main">
+              <div className="wrapper">
+                {/* Background Text */}
+                <span className="bg-text-stok">{title}</span>
+
+                {/* Title */}
+                <div className="title skew-up">
+                  <a href="#">{title}</a>
+                </div>
+
+                {/* Breadcrumb Links */}
+                <div className="slug skew-up">
+                  {links.map((link, index) => (
+                    <span key={index}>
+                      {link.to ? (
+                        <Link
+                          to={link.to}
+                          className={link.active ? "active" : ""}
+                        >
+                          {link.label}
+                        </Link>
+                      ) : (
+                        <span className={link.active ? "active" : ""}>
+                          {link.label}
+                        </span>
+                      )}
+                      {index < links.length - 1 && " / "}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-);
+    </div>
+  );
+};
 
 export default Breadcrumb;

@@ -1,53 +1,122 @@
-import Breadcrumb from "./common/Breadcrumb";
+// src/pages/ProjectPage.jsx
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axiosInstance from "../config/axios.config";
+
+// ---- helpers ----
+const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/+$/, "");
+const ORIGIN = (() => { try { return new URL(API_URL).origin; } catch { return ""; } })();
+
+function toImgUrl(input) {
+  if (!input) return "";
+  let p = String((input && input.url) ? input.url : input).trim();
+  p = p.replace(/^['"]|['"]$/g, "").replace(/\\/g, "/").replace(/([^:]\/)\/+/g, "$1");
+  if (/^https?:\/\//i.test(p)) return p;
+  if (p.startsWith("/api/")) return `${ORIGIN}${p}`;
+  if (!p.startsWith("/")) p = `/${p}`;
+  return `${ORIGIN}${p}`;
+}
 
 export default function ProjectPage() {
-  // Static project data (same file)
-  const projectData = {
-    title: "Lakhuwa Khola Small Hydro Electric Project",
-    description:
-      "The project is a run-of-river scheme that will harness the flow of Lankhuwa Khola to generate electricity. The project is Completed and got COD letter on 24 Magh 2081.",
-    image:
-      "https://sabhapokharihydro.com.np/assets/tenant/uploads/media-uploader/sabhapokharihydro/ee9281ea-ff97-4a1b-b9cb-b92b231c98c11745577542.jpg",
-    info: {
-      capacity: "5.0 MW",
-      location: "Dhupu, Sankhuwasabha District, Province No. 1, Nepal",
-      status: "Completed",
-      developer: "Sabha Pokhari Hydropower Pvt. Ltd.",
-    },
+  const { id } = useParams();                  // route: /project/:id  (or /projects/:id)
+  const [project, setProject] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const res = await axiosInstance.get(`/projects/${id}`);
+        const body = res?.data;
+        const item = body?.data ?? body ?? null;
+        if (!alive) return;
+        setProject(item);
+      } catch (e) {
+        if (!alive) return;
+        setProject(null);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => { alive = false; };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="rts-project-details-area rts-section-gap">
+        <div className="container"><p className="mt--20">Loading project…</p></div>
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="rts-project-details-area rts-section-gap">
+        <div className="container"><p className="mt--20">Project not found.</p></div>
+      </div>
+    );
+  }
+
+  // ---- normalize fields to match your desired view ----
+  const image = toImgUrl(project.image || project.thumbnail || (project.images?.[0]?.url ?? ""));
+  const title = project.title || project.name || "Project";
+  const description = project.description || project.overview || "";
+
+  // Info panel values (use nested `info` or flat fields)
+  const capacity =
+    project.info?.capacity ??
+    project.capacity ?? project.capacityMw ?? project.capacityMW ?? "";
+  const location =
+    project.info?.location ?? project.location ?? "";
+  const status =
+    project.info?.status ?? project.status ?? "";
+  const developer =
+    project.info?.developer ?? project.developer ?? "";
+
+  // Helper to render value rows only when present
+  const InfoRow = ({ icon, label, value, last }) => {
+    if (!value) return null;
+    return (
+      <div className={`single-info${last ? " last" : ""}`}>
+        <div className="info-ico"><i className={icon}></i></div>
+        <div className="info-details">
+          <span>{label}</span>
+          <h6 className="name">{String(label).includes("Capacity") && !String(value).includes("MW") ? `${value} MW` : value}</h6>
+        </div>
+      </div>
+    );
   };
 
   return (
-    <>
-    <Breadcrumb
-        title={projectData.title}
-        links={[
-          { label: "HOME", to: "/" },
-          { label: `${projectData.title}`, active: true },
-        ]}
-      />
     <div className="rts-project-details-area rts-section-gap">
       <div className="container">
-        {/* Thumbnail */}
+        {/* Row: Thumbnail */}
         <div className="row">
           <div className="col-lg-12">
             <div className="project-details-area-main">
               <div className="thumbnail">
-                <img src={projectData.image} alt="project-details" />
+                {image ? (
+                  <img
+                    src={image}
+                    alt="project-details"
+                    onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/1200x675?text=No+Image"; }}
+                  />
+                ) : null}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Content + Sidebar */}
+        {/* Row: Content + Sidebar */}
         <div className="row">
           {/* Left column */}
           <div className="col-lg-8 pr--30">
             <div className="portfolio-disc-content">
               <div className="title-area">
                 <span>Project details</span>
-                <h4 className="title">{projectData.title}</h4>
+                <h4 className="title">{title}</h4>
               </div>
-              <p className="disc">{projectData.description}</p>
+              <p className="disc">{description}</p>
             </div>
           </div>
 
@@ -59,49 +128,10 @@ export default function ProjectPage() {
                   <h5 className="title">Project Information</h5>
                 </div>
                 <div className="info-body">
-                  {/* Capacity */}
-                  <div className="single-info">
-                    <div className="info-ico">
-                      <i className="fas fa-bolt"></i>
-                    </div>
-                    <div className="info-details">
-                      <span>Capacity:</span>
-                      <h6 className="name">{projectData.info.capacity}</h6>
-                    </div>
-                  </div>
-
-                  {/* Location */}
-                  <div className="single-info">
-                    <div className="info-ico">
-                      <i className="fas fa-map-marker-alt"></i>
-                    </div>
-                    <div className="info-details">
-                      <span>Location:</span>
-                      <h6 className="name">{projectData.info.location}</h6>
-                    </div>
-                  </div>
-
-                  {/* Status */}
-                  <div className="single-info">
-                    <div className="info-ico">
-                      <i className="fas fa-check-circle"></i>
-                    </div>
-                    <div className="info-details">
-                      <span>Status:</span>
-                      <h6 className="name">{projectData.info.status}</h6>
-                    </div>
-                  </div>
-
-                  {/* Developer */}
-                  <div className="single-info last">
-                    <div className="info-ico">
-                      <i className="fas fa-industry"></i>
-                    </div>
-                    <div className="info-details">
-                      <span>Developer:</span>
-                      <h6 className="name">{projectData.info.developer}</h6>
-                    </div>
-                  </div>
+                  <InfoRow icon="fas fa-bolt" label="Capacity:" value={capacity} />
+                  <InfoRow icon="fas fa-map-marker-alt" label="Location:" value={location} />
+                  <InfoRow icon="fas fa-check-circle" label="Status:" value={status} />
+                  <InfoRow icon="fas fa-industry" label="Developer:" value={developer} last />
                 </div>
               </div>
             </div>
@@ -109,6 +139,5 @@ export default function ProjectPage() {
         </div>
       </div> 
     </div>
-    </>
   );
 }
