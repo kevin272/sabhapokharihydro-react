@@ -1,5 +1,17 @@
+// src/pages/TeamDetails.jsx
 import React from "react";
 import Breadcrumb from "../components/common/Breadcrumb";
+
+// ---- URL helpers (same pattern you use elsewhere) ----
+const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/+$/, "");
+const SERVER_URL = API_URL.replace(/\/api$/, "");
+const joinImageUrl = (p) => {
+  if (!p) return "";
+  const raw = typeof p === "string" ? p : (p.url || "");
+  return /^https?:\/\//i.test(raw)
+    ? raw
+    : `${SERVER_URL}${raw.startsWith("/") ? "" : "/"}${raw}`;
+};
 
 export default function TeamDetails() {
   const teamDetailsData = [
@@ -18,10 +30,9 @@ export default function TeamDetails() {
     },
     {
       title: "Message From The Managing Director",
-      name: "Mr. Rajendra Pokharel",
+      name: "Er. Shree Ram Devkota",
       role: "Managing Director",
-      image:
-        "https://sabhapokharihydro.com.np/assets/tenant/uploads/media-uploader/sabhapokharihydro/new-project-321745729471.png",
+      image: "http://localhost:5000/uploads/img_1758714587398-83601728.jpg",
       paragraphs: [
         "As the Managing Director of Sabhapokhari Hydropower Limited, it gives me immense pleasure to share our vision and ongoing efforts to contribute to Nepal’s hydropower sector. Our mission is to ensure sustainable, efficient, and socially responsible energy generation that strengthens Nepal’s energy independence.",
         "Hydropower is more than just electricity generation—it is about empowering communities, creating jobs, and paving the way for long-term development. At Sabhapokhari Hydropower Limited, we believe in responsible growth, where we align our development goals with environmental conservation and social welfare.",
@@ -41,98 +52,66 @@ export default function TeamDetails() {
         ]}
       />
 
-      <div style={{ paddingTop: "80px", paddingBottom: "100px" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-          {teamDetailsData.map((detail, index) => (
-            <div
-              key={index}
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                alignItems: "flex-start",
-                gap: "40px",
-                marginBottom: "80px",
-              }}
-            >
-              {/* Image */}
-              <div
-                style={{
-                  flex: "1 1 40%",
-                  maxWidth: "450px",
-                  overflow: "hidden",
-                  borderRadius: "20px",
-                  boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
-                }}
-              >
-                <img
-                  src={detail.image}
-                  alt={detail.name}
-                  style={{
-                    width: "100%",
-                    height: "100%",
-                    objectFit: "cover",
-                    display: "block",
-                    transition: "transform 0.4s",
-                  }}
-                  onMouseOver={(e) =>
-                    (e.currentTarget.style.transform = "scale(1.05)")
-                  }
-                  onMouseOut={(e) =>
-                    (e.currentTarget.style.transform = "scale(1)")
-                  }
-                />
-              </div>
+      <section className="rts-team-details-area rts-section-gap">
+        <div className="container">
+          {teamDetailsData.map((detail, idx) => {
+            const reverse = idx % 2 === 1; // alternate layout
+            const imgSrc =
+              joinImageUrl(detail.image) ||
+              "https://via.placeholder.com/800x900?text=No+Image";
 
-              {/* Text */}
-              <div
-                style={{
-                  flex: "1 1 55%",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "10px",
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: "18px",
-                    fontWeight: "600",
-                    color: "#ff6600",
-                  }}
+            return (
+              <div className="row align-items-start team-details-block g-5" key={idx}>
+                {/* Image */}
+                <div
+                  className={`col-lg-5 ${reverse ? "order-lg-2" : "order-lg-1"}`}
                 >
-                  {detail.title}
-                </span>
-                <h3
-                  style={{
-                    fontSize: "32px",
-                    fontWeight: "700",
-                    margin: "0",
-                    color: "#222",
-                  }}
-                >
-                  {detail.name}
-                </h3>
-                <p style={{ fontSize: "16px", color: "#555", margin: "0" }}>
-                  {detail.role}
-                </p>
+                  <figure className="team-details-figure">
+                    <img
+                      src={imgSrc}
+                      alt={detail.name}
+                      className="team-details-img"
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          "https://via.placeholder.com/800x900?text=No+Image";
+                      }}
+                    />
+                    <figcaption className="visually-hidden">
+                      {detail.name}, {detail.role}
+                    </figcaption>
+                  </figure>
+                </div>
 
-                {detail.paragraphs.map((para, i) => (
-                  <p
-                    key={i}
-                    style={{
-                      fontSize: "16px",
-                      color: "#555",
-                      lineHeight: "1.6",
-                      margin: "0",
-                    }}
-                  >
-                    {para}
-                  </p>
-                ))}
+                {/* Content */}
+                <div
+                  className={`col-lg-7 ${reverse ? "order-lg-1" : "order-lg-2"}`}
+                >
+                  <div className="team-details-content">
+                    <span className="team-details-eyebrow">{detail.title}</span>
+                    <h3 className="team-details-name">{detail.name}</h3>
+                    <p className="team-details-role">{detail.role}</p>
+
+                    {/* First paragraph as a soft lead / pull-quote */}
+                    {detail.paragraphs?.length > 0 && (
+                      <blockquote className="team-details-lead">
+                        {detail.paragraphs[0]}
+                      </blockquote>
+                    )}
+
+                    {/* Remaining paragraphs */}
+                    {detail.paragraphs?.slice(1).map((p, i) => (
+                      <p className="team-details-para" key={i}>
+                        {p}
+                      </p>
+                    ))}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
-      </div>
+      </section>
     </>
   );
 }

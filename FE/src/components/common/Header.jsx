@@ -142,11 +142,17 @@ export default function Header1() {
               aria-label="Open mobile menu"
             >
               {/* hamburger icon */}
-              <svg width="22" height="18" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect y="14" width="20" height="2" fill="#4AAB3D" />
-                <rect y="7" width="20" height="2" fill="#4AAB3D" />
-                <rect width="20" height="2" fill="#4AAB3D" />
-              </svg>
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="4" height="4" fill="white" />
+                        <rect y="7" width="4" height="4" fill="white" />
+                        <rect y="14" width="4" height="4" fill="white" />
+                        <rect x="7" width="4" height="4" fill="white" />
+                        <rect x="7" y="7" width="4" height="4" fill="white" />
+                        <rect x="7" y="14" width="4" height="4" fill="white" />
+                        <rect x="14" width="4" height="4" fill="white" />
+                        <rect x="14" y="7" width="4" height="4" fill="white" />
+                        <rect x="14" y="14" width="4" height="4" fill="white" />
+                    </svg>
             </div>
           </div>
         </div>

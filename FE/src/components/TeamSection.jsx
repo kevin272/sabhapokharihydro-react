@@ -4,6 +4,10 @@ import axiosInstance from "../config/axios.config"; // adjust path as needed
 const TeamSection = () => {
   const [teamMembers, setTeamMembers] = useState([]);
   const baseURL = import.meta.env.VITE_API_URL.replace("/api", "");
+const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/+$/, "");
+const SERVER_URL = API_URL.replace(/\/api$/, "");
+const joinImageUrl = (p) => (!p ? "" : /^https?:\/\//i.test(p) ? p : `${SERVER_URL}${p.startsWith("/") ? "" : "/"}${p}`);
+
 
   useEffect(() => {
     const fetchTeam = async () => {
@@ -31,31 +35,25 @@ const TeamSection = () => {
         </div>
         <div className="row mt--30 g-24">
           {teamMembers?.map((member, index) => (
-            <div className="col-lg-3" key={index}>
-              <div className="solar-energy-team">
-                <div className="thumbnail">
-                  <div style={{width: '100%', maxWidth: '600px', overflow: 'hidden', borderRadius: '20px', margin: '20px auto'}}>
-                    <img
-                      src = {member.img ? `${baseURL}${member.img}` : 'https://via.placeholder.com/300x300?text=No+Image'}
-                      alt="team"
-                      style={{
-                        width: '100%',
-                        display: 'block',
-                        transition: 'transform 0.4s, filter 0.4s',
-                        transformOrigin: 'center center',
-                        filter: 'brightness(0.9) contrast(1.1)'
-                      }}
-                      onMouseOver={e => { e.currentTarget.style.transform='scale(1.1)'; e.currentTarget.style.filter='brightness(1) contrast(1.2)'; }}
-                      onMouseOut={e => { e.currentTarget.style.transform='scale(1)'; e.currentTarget.style.filter='brightness(0.9) contrast(1.1)'; }}
-                    />
-                  </div>
-                </div>
-                <div className="inner-content">
-                  <a href="/team-details"><h5 className="title">{member.name}</h5></a>
-                  <span>{member.role}</span>
-                </div>
-              </div>
-            </div>
+<div className="col-lg-3 col-md-4 col-sm-6" key={member._id || index}>
+  <div className="solar-energy-team">
+    <div className="thumbnail">
+      <div className="team-thumb">
+        <img
+          src={member.img ? joinImageUrl(member.img) : "https://via.placeholder.com/600x750?text=No+Image"}
+          alt={member.name || "team"}
+          loading="lazy"
+          onError={(e) => { e.currentTarget.src = "https://via.placeholder.com/600x750?text=No+Image"; }}
+        />
+      </div>
+    </div>
+    <div className="inner-content">
+      <a href="/team-details"><h5 className="title">{member.name}</h5></a>
+      <span>{member.role}</span>
+    </div>
+  </div>
+</div>
+
           ))}
         </div>
       </div>

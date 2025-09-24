@@ -90,3 +90,98 @@
   object-position: center;
 }
 
+/* Fixed, consistent portrait frame for team images */
+.team-thumb{
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1/1;        /* consistent shape; change to 1/1 for square */
+  border-radius: 20px;
+  overflow: hidden;
+  background: #f3f4f6;        /* subtle skeleton bg */
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+
+.team-thumb > img{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;           /* crop to fill */
+  object-position: center;
+  transition: transform .4s ease, filter .4s ease;
+  filter: brightness(.95) contrast(1.05);
+}
+
+/* Hover polish like your GallerySection */
+.solar-energy-team:hover .team-thumb > img{
+  transform: scale(1.06);
+  filter: brightness(1) contrast(1.1);
+}
+
+/* Optional: ensure card bottoms align nicely */
+.solar-energy-team .inner-content{
+  text-align: center;
+  padding-top: 10px;
+}
+
+/* Distinct yet minimal styling for team details */
+.rts-team-details-area { padding-top: 80px; padding-bottom: 100px; }
+.team-details-block + .team-details-block { margin-top: 80px; }
+
+.team-details-figure {
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(0,0,0,.12);
+  transform: translateZ(0);
+}
+.team-details-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .5s ease;
+}
+.team-details-figure:hover .team-details-img { transform: scale(1.035); }
+
+.team-details-content { max-width: 720px; }
+.team-details-eyebrow {
+  display: inline-block;
+  font-weight: 600;
+  letter-spacing: .3px;
+  color: #ff6600;
+  margin-bottom: 8px;
+}
+.team-details-name {
+  margin: 0 0 2px 0;
+  font-size: clamp(26px, 3.2vw, 34px);
+  font-weight: 700;
+  color: #222;
+}
+.team-details-role {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  color: #666;
+}
+
+.team-details-lead {
+  margin: 14px 0 16px 0;
+  padding: 16px 18px;
+  background: #fff7f0;
+  border-left: 4px solid #ff6600;
+  border-radius: 8px;
+  color: #444;
+  line-height: 1.65;
+}
+.team-details-para {
+  color: #555;
+  line-height: 1.75;
+  margin: 0 0 12px 0;
+}
+
+/* Utility */
+.visually-hidden {
+  position: absolute !important;
+  height: 1px; width: 1px;
+  overflow: hidden; clip: rect(1px, 1px, 1px, 1px);
+  white-space: nowrap; border: 0; padding: 0; margin: -1px;
+}
