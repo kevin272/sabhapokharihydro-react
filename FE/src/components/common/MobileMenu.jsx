@@ -81,8 +81,8 @@ export default function SidebarOffcanvas({
               Sabhapokhari Hydropower Limited is dedicated to developing Nepal’s renewable energy potential.
             </p>
             <div className="footer">
-              <h4 className="title">Want to know more?</h4>
-              <Link to="/project" className="rts-btn btn-primary">Explore Project</Link>
+              <h4 className="title">Are you an admin?</h4>
+              <Link to="/login" className="rts-btn btn-primary">Login</Link>
             </div>
           </div>
         </div>
@@ -155,6 +155,9 @@ export default function SidebarOffcanvas({
 
               <li>
                 <Link className="main" to="/contact">CONTACT</Link>
+              </li>
+              <li>
+                <Link className="main" to="/login">LOGIN</Link>
               </li>
             </ul>
           </nav>
