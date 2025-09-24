@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axiosInstance from "../config/axios.config";
+import Breadcrumb from "../components/common/Breadcrumb";
 
 // ---- URL & date helpers ----
 const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/+$/, "");
@@ -109,7 +110,14 @@ export default function BlogDetails() {
     }
   }
 
-  return (
+  return (<>
+  <Breadcrumb
+    title= "Blog Details"
+    links={[
+        { label: "HOME", to: "/" },
+        { label: "Blog Details", active: true },
+    ]}
+    />
     <div className="rts-blog-list-area">
       <div className="container d-flex justify-content-center">
         <div
@@ -197,5 +205,6 @@ export default function BlogDetails() {
         </div>
       </div> 
     </div>
+    </>
   );
 }

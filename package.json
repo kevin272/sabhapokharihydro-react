@@ -7,7 +7,7 @@
     "backend": "cd BE && npm run dev",
     "frontend": "cd FE && npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cd FE && npm install --include=dev && npm run build && cd ../BE && npm install",
+    "build": "npm install && cd FE && npm install --include=dev && npm run build && cd ../BE && npm install",
     "start": "concurrently -n BE,FE -c blue,green \"npm:backend\" \"npm:frontend\""
   },
   "repository": {

@@ -80,13 +80,23 @@ export default function GalleryDashboard() {
         rows={(images || []).map((img) => (
           <tr key={img._id}>
             <td>{img.title}</td>
-            <td>
-              <img
-                src={joinImageUrl(img.image)}
-                alt={img.title}
-                style={{ width: "100px", height: "auto", objectFit: "cover" }}
-              />
-            </td>
+            <td style={{ width: 160 }}>
+  <div className="thumb-fixed">
+    <img
+      src={joinImageUrl(img.image)}
+      alt={img.title || "Gallery image"}
+      onError={(e) => {
+        // graceful fallback (light gray block)
+        e.currentTarget.src =
+          "data:image/svg+xml;charset=UTF-8," +
+          encodeURIComponent(
+            `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 90'><rect width='100%' height='100%' fill='#e5e7eb'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='12' fill='#9ca3af'>no image</text></svg>`
+          );
+      }}
+    />
+  </div>
+</td>
+
             <td>
               <button
                 className="btn btn-sm btn-danger"

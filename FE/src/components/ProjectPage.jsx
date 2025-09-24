@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axiosInstance from "../config/axios.config";
+import Breadcrumb from "./common/Breadcrumb";
 
 // ---- helpers ----
 const API_URL = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/+$/, "");
@@ -88,6 +89,14 @@ export default function ProjectPage() {
   };
 
   return (
+    <>
+    <Breadcrumb
+    title= {project.title || project.name || "Project Details"}
+    links={[
+        { label: "HOME", to: "/" },
+        { label: `${project.title || project.name || "Project Details"}`, active: true },
+    ]}
+    />
     <div className="rts-project-details-area rts-section-gap">
       <div className="container">
         {/* Row: Thumbnail */}
@@ -139,5 +148,6 @@ export default function ProjectPage() {
         </div>
       </div> 
     </div>
+    </>
   );
 }
